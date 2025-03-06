@@ -1,11 +1,16 @@
 -- init.sql.template
 
 -- Create databases for different applications
+CREATE DATABASE '${POSTGRES_DB}';
 CREATE DATABASE metabase;
 CREATE DATABASE n8n;
 CREATE DATABASE fleetmgt;  -- Quotes are required for names with hyphens
 
 -- Create roles and grant privileges
+
+CREATE USER '${POSTGRES_USER}' WITH ENCRYPTED PASSWORD '${POSTGRES_PASSWORD}';
+GRANT ALL PRIVILEGES ON DATABASE '${POSTGRES_DB}' TO '${POSTGRES_USER}';
+ALTER DATABASE '${POSTGRES_DB}' OWNER TO '${POSTGRES_USER}';
 
 -- For Metabase
 CREATE ROLE metabase_user WITH LOGIN PASSWORD '${METABASE_PASSWORD}';
