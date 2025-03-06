@@ -14,8 +14,8 @@ RUN chmod +x /docker-entrypoint-initdb.d/init.sh
 EXPOSE 5432
 
 # Add a HEALTHCHECK that uses pg_isready to check the database status
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD pg_isready -U "$POSTGRES_USER" || exit 1
-
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
+  CMD pg_isready -U "$POSTGRES_USER" -d postgres || exit 1
+  
 # Start PostgreSQL using the custom configuration file
 CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
