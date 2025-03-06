@@ -1,21 +1,22 @@
-# Dockerfile
+# Use official PostgreSQL image
 FROM postgres:14
 
-# Copy the custom PostgreSQL configuration file
+# Copy custom PostgreSQL configuration
 COPY postgresql.conf /etc/postgresql/postgresql.conf
 
-# Copy initialization scripts including the missing template
+# Copy initialization scripts
 COPY init-scripts/ /docker-entrypoint-initdb.d/
 
-# Ensure all scripts are executable
-RUN chmod +x /docker-entrypoint-initdb.d/init.sh
+# Ensure scripts are executable and writable
+RUN chmod -R 755 /docker-entrypoint-initdb.d && \
+    chown -R postgres:postgres /docker-entrypoint-initdb.d
 
-# Expose the PostgreSQL default port
+# Expose PostgreSQL port
 EXPOSE 5432
 
-# Add a HEALTHCHECK that uses pg_isready to check the database status
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
-  CMD pg_isready -U "$POSTGRES_USER" -d postgres || exit 1
+# Add a health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" || exit 1
 
-# Start PostgreSQL using the custom configuration file
+# Start PostgreSQL with custom config
 CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
